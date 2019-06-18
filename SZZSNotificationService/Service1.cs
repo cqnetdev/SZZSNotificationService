@@ -115,7 +115,7 @@ namespace SZZSNotificationService
                         int resp = 0;
                         bool retValue = false;
                         int err = 0;
-                        Interop.ShowMessageBox("请立即收集晴天卡", "大盘晴雨表", out resp, out err, out retValue);
+                        Interop.ShowMessageBox("请立即收集晴天卡(确定：立即处理  取消：再次提醒)", "大盘晴雨表", out resp, out err, out retValue);
                         if (resp == 6)
                         {
                             LastNotificationDate = dateNow.Date;
@@ -129,7 +129,7 @@ namespace SZZSNotificationService
                         int resp = 0;
                         bool retValue = false;
                         int err = 0;
-                        Interop.ShowMessageBox("请立即收集晴天卡", "大盘晴雨表", out resp, out err, out retValue);
+                        Interop.ShowMessageBox("请立即收集晴天卡(确定：立即处理  取消：再次提醒)", "大盘晴雨表", out resp, out err, out retValue);
                         if (resp == 6)
                         {
                             LastNotificationDate = dateNow.Date;
