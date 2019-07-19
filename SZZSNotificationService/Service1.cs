@@ -94,16 +94,17 @@ namespace SZZSNotificationService
         }
         private void StartService()
         {
-            OnTimedEvent(null,null);
+            OnTimedEvent(null, null);
             System.Timers.Timer aTimer = new System.Timers.Timer();
             aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-            aTimer.Interval = 30* 1000;
+            aTimer.Interval = 30 * 1000;
             aTimer.Enabled = true;
             GC.KeepAlive(aTimer);
         }
 
         private static DateTime LastNotificationDate = DateTime.Now.Date.AddDays(-1);
-        private void OnTimedEvent(object sender, ElapsedEventArgs e)
+        private static bool isShow = false;
+        public void OnTimedEvent(object sender, ElapsedEventArgs e)
         {
             DateTime dateNow = DateTime.Now;
             if (dateNow.Date > LastNotificationDate)
@@ -112,13 +113,21 @@ namespace SZZSNotificationService
                 {
                     if (GetSZZSResult())
                     {
-                        int resp = 0;
-                        bool retValue = false;
-                        int err = 0;
-                        Interop.ShowMessageBox("请立即收集晴天卡(确定：立即处理  取消：再次提醒)", "大盘晴雨表", out resp, out err, out retValue);
-                        if (resp == 6)
+                        if (!isShow)
                         {
-                            LastNotificationDate = dateNow.Date;
+                            isShow = true;
+                            int resp = 0;
+                            bool retValue = false;
+                            int err = 0;
+                            Interop.ShowMessageBox("请立即收集晴天卡(确定：立即处理  取消：再次提醒)", "大盘晴雨表", out resp, out err, out retValue);
+                            if (resp != 0)
+                            {
+                                isShow = false;
+                                if (resp == 6)
+                                {
+                                    LastNotificationDate = dateNow.Date;
+                                }
+                            }
                         }
                     }
                 }
@@ -126,13 +135,21 @@ namespace SZZSNotificationService
                 {
                     if (GetSZZSResult())
                     {
-                        int resp = 0;
-                        bool retValue = false;
-                        int err = 0;
-                        Interop.ShowMessageBox("请立即收集晴天卡(确定：立即处理  取消：再次提醒)", "大盘晴雨表", out resp, out err, out retValue);
-                        if (resp == 6)
+                        if (!isShow)
                         {
-                            LastNotificationDate = dateNow.Date;
+                            isShow = true;
+                            int resp = 0;
+                            bool retValue = false;
+                            int err = 0;
+                            Interop.ShowMessageBox("请立即收集晴天卡(确定：立即处理  取消：再次提醒)", "大盘晴雨表", out resp, out err, out retValue);
+                            if (resp != 0)
+                            {
+                                isShow = false;
+                                if (resp == 6)
+                                {
+                                    LastNotificationDate = dateNow.Date;
+                                }
+                            }
                         }
                     }
                 }
