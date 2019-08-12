@@ -155,7 +155,23 @@ namespace SZZSNotificationService
                 }
             }
         }
+
         public static bool GetSZZSResult()
+        {
+            bool retValue = false;
+            bool isCollectCard = false;
+            if (GetSZZSResultFromEastMoney(ref isCollectCard))
+            {
+                return isCollectCard;
+            }
+            else if (GetSZZSResultFrom10jqka(ref isCollectCard))
+            {
+                return isCollectCard;
+            }
+            return retValue;
+        }
+
+        public static bool GetSZZSResultFromEastMoney(ref bool isCollectCard)
         {
             bool retValue = false;
             try
@@ -166,35 +182,92 @@ namespace SZZSNotificationService
                 String s = response.Content.ReadAsStringAsync().Result;
                 if (!string.IsNullOrEmpty(s))
                 {
-                    s = s.Substring(s.IndexOf("display") + 9, 100);
-                    s = s.Substring(0, s.IndexOf("}") + 1) + "}";
-                    Debug.WriteLine(s);
-                    JObject obj = JObject.Parse(s);
-                    string info = obj["cur"]["info"].ToString();
+                    /* s = s.Substring(s.IndexOf("display") + 9, 100);
+                     s = s.Substring(0, s.IndexOf("}") + 1) + "}";
+                     Debug.WriteLine(s);
+                     JObject obj = JObject.Parse(s);
+                     string info = obj["cur"]["info"].ToString();*/
+                    string propertyStr = s.Substring(s.IndexOf("property") + 11, 250);
+                    propertyStr = propertyStr.Substring(0, propertyStr.IndexOf("}") + 1) + "}}}";
+                    JObject propertyObj = JObject.Parse(propertyStr);
+                    long _update_time = long.Parse(propertyObj["_update_time"].ToString());
+                    long timenow = GetTimeStamp();
+                    if (timenow - _update_time >= 60)
+                    {
+                        return retValue;
+                    }
+                    string info = propertyObj["data"]["display"]["cur"]["info"].ToString();
                     string currentIndex = info.Substring(info.IndexOf("(") + 1, info.IndexOf(")") - info.IndexOf("(") - 2);
                     double indexVal = 0;
                     if (double.TryParse(currentIndex, out indexVal))
                     {
                         if (indexVal > 0.2)
                         {
-                            retValue = true;
-                            WriteLogToFile(s);
+                            isCollectCard = true;
+                            WriteLogToFile("东方财富网：" + propertyStr);
                         }
                     }
-                    else
-                    {
-                        retValue = false;
-                    }
-
+                    retValue = true;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                WriteLogToFile("执行方法GetSZZSResultFromEastMoney出现异常，错误详情：" + ex.ToString());
                 retValue = false;
             }
-
             return retValue;
+        }
+
+        public static bool GetSZZSResultFrom10jqka(ref bool isCollectCard)
+        {
+            bool retValue = false;
+            try
+            {
+                HttpClient httpClient = new HttpClient();
+                String url = "https://sp0.baidu.com/8aQDcjqpAAV3otqbppnN2DJv/api.php?resource_id=8190&from_mid=1&query=%E4%B8%8A%E8%AF%81%E6%8C%87%E6%95%B0&hilight=disp_data.*.title&sitesign=6d76d21eb8e329b261b4859a72510a9b&eprop=minute";
+                HttpResponseMessage response = httpClient.GetAsync(new Uri(url)).Result;
+                String s = response.Content.ReadAsStringAsync().Result;
+                if (!string.IsNullOrEmpty(s))
+                {
+                    string propertyStr = s.Substring(s.IndexOf("property") + 11, 250);
+                    propertyStr = propertyStr.Substring(0, propertyStr.IndexOf("}") + 1) + "}}}";
+                    JObject propertyObj = JObject.Parse(propertyStr);
+                    long _update_time = long.Parse(propertyObj["_update_time"].ToString());
+                    long timenow = GetTimeStamp();
+                    if (timenow - _update_time >= 60)
+                    {
+                        return retValue;
+                    }
+                    string info = propertyObj["data"]["display"]["cur"]["info"].ToString();
+                    string currentIndex = info.Substring(info.IndexOf("(") + 1, info.IndexOf(")") - info.IndexOf("(") - 2);
+                    double indexVal = 0;
+                    if (double.TryParse(currentIndex, out indexVal))
+                    {
+                        if (indexVal > 0.2)
+                        {
+                            isCollectCard = true;
+                            WriteLogToFile("同花顺：" + propertyStr);
+                        }
+                    }
+                    retValue = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteLogToFile("执行方法GetSZZSResultFrom10jqka出现异常，错误详情：" + ex.ToString());
+                retValue = false;
+            }
+            return retValue;
+        }
+
+        /// <summary> 
+        /// 获取时间戳 
+        /// </summary> 
+        /// <returns></returns> 
+        public static long GetTimeStamp()
+        {
+            TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return long.Parse(Convert.ToInt64(ts.TotalSeconds).ToString());
         }
     }
 }

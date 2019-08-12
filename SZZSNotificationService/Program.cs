@@ -21,8 +21,7 @@ namespace SZZSNotificationService
             };
             ServiceBase.Run(ServicesToRun);
 
-           /* Service1 s = new Service1();
-            s.OnTimedEvent(null, null);*/
+            //Service1.GetSZZSResult();
         }
     }
 }
