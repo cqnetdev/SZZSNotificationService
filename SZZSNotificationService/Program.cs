@@ -21,7 +21,7 @@ namespace SZZSNotificationService
             };
             ServiceBase.Run(ServicesToRun);
 
-            //Service1.GetSZZSResult();
+           /* Service1.GetSZZSResult();*/
         }
     }
 }

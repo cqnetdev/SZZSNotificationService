@@ -182,13 +182,8 @@ namespace SZZSNotificationService
                 String s = response.Content.ReadAsStringAsync().Result;
                 if (!string.IsNullOrEmpty(s))
                 {
-                    /* s = s.Substring(s.IndexOf("display") + 9, 100);
-                     s = s.Substring(0, s.IndexOf("}") + 1) + "}";
-                     Debug.WriteLine(s);
-                     JObject obj = JObject.Parse(s);
-                     string info = obj["cur"]["info"].ToString();*/
-                    string propertyStr = s.Substring(s.IndexOf("property") + 11, 250);
-                    propertyStr = propertyStr.Substring(0, propertyStr.IndexOf("}") + 1) + "}}}";
+                    JObject spropertyObj = JObject.Parse(s);
+                    string propertyStr = spropertyObj["data"][0]["disp_data"][0]["property"][0].ToString();
                     JObject propertyObj = JObject.Parse(propertyStr);
                     long _update_time = long.Parse(propertyObj["_update_time"].ToString());
                     long timenow = GetTimeStamp();
@@ -229,8 +224,8 @@ namespace SZZSNotificationService
                 String s = response.Content.ReadAsStringAsync().Result;
                 if (!string.IsNullOrEmpty(s))
                 {
-                    string propertyStr = s.Substring(s.IndexOf("property") + 11, 250);
-                    propertyStr = propertyStr.Substring(0, propertyStr.IndexOf("}") + 1) + "}}}";
+                    JObject spropertyObj = JObject.Parse(s);
+                    string propertyStr = spropertyObj["data"][0]["disp_data"][0]["property"][0].ToString();
                     JObject propertyObj = JObject.Parse(propertyStr);
                     long _update_time = long.Parse(propertyObj["_update_time"].ToString());
                     long timenow = GetTimeStamp();
